@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiniShop</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f6f6f6;color:#111}
+header{background:#111;color:#fff;padding:16px 6%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:2}
+header h1{margin:0;font-size:20px}.cartbtn{border:0;border-radius:999px;padding:9px 14px;cursor:pointer}
+.hero{text-align:center;padding:48px 20px}.hero h2{margin:0 0 8px;font-size:34px}.hero p{margin:0;color:#666}
+.search{display:block;width:min(92%,520px);margin:0 auto 30px;padding:12px 16px;border:1px solid #ddd;border-radius:999px;outline:none}
+.products{width:min(88%,1100px);margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;padding-bottom:50px}
+.card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 6px 24px #00000010}.card img{width:100%;height:210px;object-fit:cover;border-radius:10px}
+.card h3{margin:12px 0 6px}.price{margin:0 0 12px;color:#555}.add{width:100%;padding:11px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer}
+#cart{position:fixed;top:0;right:-380px;width:360px;max-width:92%;height:100%;background:#fff;box-shadow:-8px 0 28px #0002;padding:22px;transition:.25s;z-index:3;overflow:auto}
+#cart.open{right:0}.carthead{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:none;font-size:26px;cursor:pointer}
+.item{padding:12px 0;border-bottom:1px solid #eee}.qty button{margin:8px 6px 0 0;padding:4px 9px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer}
+.total{font-size:20px;font-weight:700;margin:22px 0}.checkout{width:100%;padding:12px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer}
+.empty{color:#666}
+</style>
+</head>
+<body>
+<header><h1>MiniShop</h1><button class="cartbtn" onclick="toggleCart()">🛒 Cart (<span id="count">0</span>)</button></header>
+<section class="hero"><h2>Simple. Clean. Shopping.</h2><p>A tiny e-commerce demo that works on GitHub Pages.</p></section>
+<input id="search" class="search" placeholder="Search products..." oninput="render(this.value)">
+<main id="products" class="products"></main>
+<aside id="cart">
+<div class="carthead"><h2>Your Cart</h2><button class="close" onclick="toggleCart()">×</button></div>
+<div id="cartItems"></div>
+<div class="total">Total: ₹<span id="total">0</span></div>
+<button class="checkout" onclick="checkout()">Checkout</button>
+</aside>
+<script>
+const products=[
+{id:1,name:"Classic T-Shirt",price:499,image:"https://picsum.photos/500/500?random=11"},
+{id:2,name:"Sneakers",price:1499,image:"https://picsum.photos/500/500?random=12"},
+{id:3,name:"Headphones",price:999,image:"https://picsum.photos/500/500?random=13"},
+{id:4,name:"Backpack",price:799,image:"https://picsum.photos/500/500?random=14"}
+];
+let cart=[];
+function render(q=""){
+q=q.toLowerCase().trim();
+const list=products.filter(p=>p.name.toLowerCase().includes(q));
+document.getElementById("products").innerHTML=list.map(p=>`<article class="card">
+<img src="${p.image}" alt="${p.name}">
+<h3>${p.name}</h3><p class="price">₹${p.price}</p>
+<button class="add" onclick="add(${p.id})">Add to Cart</button>
+</article>`).join("")||"<p>No products found.</p>";
+}
+function add(id){const x=cart.find(i=>i.id===id);if(x)x.qty++;else{const p=products.find(p=>p.id===id);cart.push({...p,qty:1});}update()}
+function change(id,d){const x=cart.find(i=>i.id===id);if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(i=>i.id!==id);update()}
+function update(){
+document.getElementById("cartItems").innerHTML=cart.length?cart.map(i=>`<div class="item"><b>${i.name}</b><div>₹${i.price} × ${i.qty}</div><div class="qty"><button onclick="change(${i.id},-1)">−</button><button onclick="change(${i.id},1)">+</button></div></div>`).join(""):'<p class="empty">Your cart is empty.</p>';
+document.getElementById("count").textContent=cart.reduce((a,i)=>a+i.qty,0);
+document.getElementById("total").textContent=cart.reduce((a,i)=>a+i.price*i.qty,0);
+}
+function toggleCart(){document.getElementById("cart").classList.toggle("open")}
+function checkout(){if(!cart.length)return alert("Your cart is empty!");alert("Order placed successfully!");cart=[];update();toggleCart()}
+render();update();
+</script>
+</body>
+</html>
