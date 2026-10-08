@@ -3,7 +3,7 @@ name: Deploy NovaShop to Pages
 
 on:
   push:
-    branches: ["sit"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
